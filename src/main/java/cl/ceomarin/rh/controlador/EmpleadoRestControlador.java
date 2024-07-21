@@ -1,11 +1,13 @@
 package cl.ceomarin.rh.controlador;
 
+import cl.ceomarin.rh.excepcion.RecursoNoEncontradoExepcion;
 import cl.ceomarin.rh.modelo.Empleado;
 import cl.ceomarin.rh.servicio.EmpleadoServicio;
 import cl.ceomarin.rh.servicio.IEmpleadoServicio;
 import org.slf4j.LoggerFactory;
 import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
@@ -29,7 +31,17 @@ public class EmpleadoRestControlador {
 
     @PostMapping("/empleados")
     public Empleado agregarEmpleado(@RequestBody Empleado empleado){
-        logger.info("Empleado a agreagr: "+empleado);
+        logger.info("Empleado que se agregará: "+empleado);
         return empleadoServicio.guardarEmpleado(empleado);
+    }
+
+    @GetMapping("/empleados/{id}")
+    public ResponseEntity<Empleado> obtenerEmpleadoPorId(@PathVariable Long id) {
+        Empleado empleado = empleadoServicio.buscarEmpleadoPorId(id);
+        if (empleado == null) {
+            throw new RecursoNoEncontradoExepcion("No se encontro el id:" + id);
+        }
+        logger.info("Empleado: " + empleado);
+        return ResponseEntity.ok(empleado);
     }
 }
