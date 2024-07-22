@@ -11,7 +11,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("api")
@@ -41,7 +43,31 @@ public class EmpleadoRestControlador {
         if (empleado == null) {
             throw new RecursoNoEncontradoExepcion("No se encontro el id:" + id);
         }
-        logger.info("Empleado: " + empleado);
         return ResponseEntity.ok(empleado);
+    }
+
+    @PutMapping("/empleados/{id}")
+    public ResponseEntity<Empleado> actualizarEmpleado(@PathVariable Long id, @RequestBody Empleado empleadoRecibido){
+        Empleado empleado = empleadoServicio.buscarEmpleadoPorId(id);
+        if(empleado == null){
+            throw new RecursoNoEncontradoExepcion("El id recibido no existe; "+id);
+        }
+        empleado.setNombre(empleadoRecibido.getNombre());
+        empleado.setDepartamento(empleadoRecibido.getDepartamento());
+        empleado.setSueldo(empleadoRecibido.getSueldo());
+        empleadoServicio.guardarEmpleado(empleado);
+        return ResponseEntity.ok(empleado);
+    }
+
+    @DeleteMapping("/empleados/{id}")
+    public ResponseEntity<Map<String,Boolean>> eliminarEmpleado(@PathVariable Long id){
+        Empleado empleado = empleadoServicio.buscarEmpleadoPorId(id);
+        if(empleado == null){
+            throw new RecursoNoEncontradoExepcion("El id recibido no existe:"+id);
+        }
+        empleadoServicio.eliminarEmpleado(empleado);
+        Map<String,Boolean> respuesta = new HashMap<>();
+        respuesta.put("eliminado",Boolean.TRUE);
+        return ResponseEntity.ok(respuesta);
     }
 }

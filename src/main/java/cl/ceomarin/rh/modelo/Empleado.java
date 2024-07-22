@@ -1,16 +1,15 @@
 package cl.ceomarin.rh.modelo;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-import lombok.ToString;
+import lombok.*;
 
 @Entity
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @ToString
+@Setter
+@Getter
 @Table(name = "empleado")
 public class Empleado {
     @Id
