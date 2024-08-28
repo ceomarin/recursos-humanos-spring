@@ -1,8 +1,10 @@
 package cl.ceomarin.rh.servicio;
 
+import cl.ceomarin.rh.excepcion.RecursoNoEncontradoExepcion;
 import cl.ceomarin.rh.modelo.Empleado;
 import cl.ceomarin.rh.repositorio.EmpleadoRepositorio;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -14,21 +16,28 @@ public class EmpleadoServicio implements IEmpleadoServicio{
 
     @Override
     public List<Empleado> listarEmpleados() {
-        return empleadoRepositorio.findAll();
+        return empleadoRepositorio.findAllEmpleados();
     }
 
     @Override
     public Empleado buscarEmpleadoPorId(Long id) {
-        return empleadoRepositorio.findById(id).orElse(null);
+        Empleado empleado = empleadoRepositorio.empleadoFindById(id);
+        if (empleado == null) {
+            throw new RecursoNoEncontradoExepcion("Empleado no encontrado con ID: " + id);
+        }
+        return empleado;
     }
-
     @Override
     public Empleado guardarEmpleado(Empleado empleado) {
         return empleadoRepositorio.save(empleado);
     }
-
     @Override
     public void eliminarEmpleado(Empleado empleado) {
-        empleadoRepositorio.delete(empleado);
+
+        if (empleado != null && empleado.getId() != null) {
+            empleadoRepositorio.deleteByIdNative(empleado.getId());
+        } else {
+            throw new IllegalArgumentException("Empleado o ID no puede ser nulo");
+        }
     }
 }
